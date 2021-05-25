@@ -10,6 +10,10 @@ namespace TestTaskTelegramBot
     class Program
     {
         private static ITelegramBotClient botClient;
+
+        /// <summary>
+        /// Start function
+        /// </summary>
         static void Main(string[] args)
         {
             botClient = Bot.Get();
@@ -22,14 +26,18 @@ namespace TestTaskTelegramBot
             Console.ReadKey();
         }
 
+        /// <summary>
+        /// Creates tables if they don't exist
+        /// </summary>
         private static void LoadDB()
         {
-            DatabaseHandler.ExecuteSQL("CREATE TABLE items (item_id INTEGER, name VARCHAR(25), description VARCHAR(255), price INTEGER, picture VARCHAR(255), cooking_time VARCHAR(255), category VARCHAR(30))");
-            DatabaseHandler.ExecuteSQL("CREATE TABLE users (chat_id INTEGER, cart VARCHAR(255))");
+            DatabaseHandler.ExecuteSQL("CREATE TABLE IF NOT EXISTS items (item_id INTEGER, name VARCHAR(25), description VARCHAR(255), price INTEGER, picture VARCHAR(255), cooking_time VARCHAR(255), category VARCHAR(30))");
+            DatabaseHandler.ExecuteSQL("CREATE TABLE IF NOT EXISTS users (chat_id INTEGER, cart VARCHAR(255))");
+            //DatabaseHandler.ExecuteSQL("INSERT INTO items VALUES (1, \'плов\', \'пловный плов\', 5000, \'https://avatars.githubusercontent.com/u/45800215?v=4\', \'10 мин\', \'main_course\')");
         }
 
         /// <summary>
-        /// Принимает и обрабатывает клавиатуру под сообщениями
+        /// Gets and handles the keyboard
         /// </summary>
         private static void OnCallbackQuery(object sender, CallbackQueryEventArgs e)
         {
@@ -38,11 +46,16 @@ namespace TestTaskTelegramBot
             string check = e.CallbackQuery.Data;
             string dishId = "0";
 
-            if (e.CallbackQuery.Message.Text.Contains("menu:add_to_cart"))
+            if (check.Length > 15)
             {
-                dishId = check.Substring(16);
-                check = "menu:add_to_cart";
+                string cut = e.CallbackQuery.Data.Substring(0, 16);
+                if (cut.Equals("menu:add_to_cart"))
+                {
+                    dishId = check.Substring(16);
+                    check = "menu:add_to_cart";
+                }
             }
+            
 
             switch (check)
             {
@@ -60,11 +73,14 @@ namespace TestTaskTelegramBot
                 case "menu:add_to_cart":
                     Menu.AddToCart(chatId, dishId);
                     return;
+                case "cart:overview":
+                    Cart.Overview(chatId);
+                    return;
             }
         }
 
         /// <summary>
-        /// Принимает и обрабатывает сообщения 
+        /// Gets and handles the messages
         /// </summary>
         private static void OnMessageRecieved(object sender, MessageEventArgs e)
         {
