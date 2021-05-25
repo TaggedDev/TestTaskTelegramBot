@@ -3,6 +3,7 @@ using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 using TestTaskTelegramBot.Commands;
+using TestTaskTelegramBot.Service;
 
 namespace TestTaskTelegramBot
 {
@@ -13,11 +14,18 @@ namespace TestTaskTelegramBot
         {
             botClient = Bot.Get();
             var me = botClient.GetMeAsync().Result;
+            LoadDB();
 
             botClient.OnMessage += OnMessageRecieved;
             botClient.OnCallbackQuery += OnCallbackQuery;
             botClient.StartReceiving();
             Console.ReadKey();
+        }
+
+        private static void LoadDB()
+        {
+            DatabaseHandler.ExecuteSQL("CREATE TABLE items (item_id INTEGER, name VARCHAR(25), description VARCHAR(255), price INTEGER, picture VARCHAR(255), cooking_time VARCHAR(255), category VARCHAR(30))");
+            DatabaseHandler.ExecuteSQL("CREATE TABLE users (chat_id INTEGER, cart VARCHAR(255))");
         }
 
         /// <summary>
@@ -28,12 +36,12 @@ namespace TestTaskTelegramBot
             long chatId = e.CallbackQuery.Message.Chat.Id;
 
             string check = e.CallbackQuery.Data;
-            int dishId = 0;
+            string dishId = "0";
 
             if (e.CallbackQuery.Message.Text.Contains("menu:add_to_cart"))
             {
+                dishId = check.Substring(16);
                 check = "menu:add_to_cart";
-                dishId = 1;
             }
 
             switch (check)
@@ -50,6 +58,7 @@ namespace TestTaskTelegramBot
                     Menu.SendDishesCategory(chatId, "dessert");
                     return;
                 case "menu:add_to_cart":
+                    Menu.AddToCart(chatId, dishId);
                     return;
             }
         }

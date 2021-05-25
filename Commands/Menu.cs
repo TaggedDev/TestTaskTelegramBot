@@ -45,5 +45,10 @@ namespace TestTaskTelegramBot.Commands
                     );
             }
         }
+
+        public async static void AddToCart(long chatId, string dishId)
+        {
+            DatabaseHandler.AddItem(chatId, dishId);
+        }
     }
 }
