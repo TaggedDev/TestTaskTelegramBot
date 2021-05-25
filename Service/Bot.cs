@@ -10,7 +10,7 @@ namespace TestTaskTelegramBot
         private static TelegramBotClient botClient;
 
         /// <summary>
-        /// Возвращает экземляр TelegramBotClient. Токен бота берётся из файла tokenfile.txt
+        /// Returns TelegramBotClient. Takes token from tokenfile.txt
         /// </summary>
         /// <returns></returns>
         public static TelegramBotClient Get()
