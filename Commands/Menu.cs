@@ -24,9 +24,9 @@ namespace TestTaskTelegramBot.Commands
         }
 
         /// <summary>
-        /// Функция для отправки основных блюд 
+        /// Функция для отправки блюд 
         /// </summary>
-        public async static void SendMainCourse(ChatId chatId)
+        public async static void SendDishesCategory(ChatId chatId, string name)
         {
             List<Dish> dishes = new List<Dish>();
 
@@ -34,13 +34,13 @@ namespace TestTaskTelegramBot.Commands
             {
                 var inlineKeyboard = new InlineKeyboardMarkup(new[]
                                {
-                                new[] { InlineKeyboardButton.WithCallbackData("Добавить в корзину", "menu:add_to_chart") }
+                                new[] { InlineKeyboardButton.WithCallbackData("Добавить в корзину", $"menu:add_to_chart{dishes[i].ItemId}") }
                             });
 
                 await Bot.Get().SendPhotoAsync(
                     chatId: chatId,
-                    photo: "https://github.com/TelegramBots/book/raw/master/src/docs/photo-ara.jpg",
-                    caption:  "I am a cool text!",
+                    photo: dishes[i].Link,
+                    caption:  $"<b>{dishes[i].Name}</b>\n{dishes[i].Description}\n\nПриблизительное время приготовления: <i>{dishes[i].CookingTime}<i>\nЦена: <i>{dishes[i].Price}<i>",
                     replyMarkup: inlineKeyboard
                     );
             }

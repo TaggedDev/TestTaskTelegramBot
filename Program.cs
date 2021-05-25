@@ -27,7 +27,16 @@ namespace TestTaskTelegramBot
         {
             long chatId = e.CallbackQuery.Message.Chat.Id;
 
-            switch (e.CallbackQuery.Data)
+            string check = e.CallbackQuery.Data;
+            int dishId = 0;
+
+            if (e.CallbackQuery.Message.Text.Contains("menu:add_to_cart"))
+            {
+                check = "menu:add_to_cart";
+                dishId = 1;
+            }
+
+            switch (check)
             {
                 case "start:menu":
                     Menu.StartMenu(chatId);
@@ -35,11 +44,13 @@ namespace TestTaskTelegramBot
                 case "start:cart":
                     return;
                 case "menu:main_course":
-                    Menu.SendMainCourse(chatId);
+                    Menu.SendDishesCategory(chatId, "main_course");
                     return;
                 case "menu:dessert":
+                    Menu.SendDishesCategory(chatId, "dessert");
                     return;
-
+                case "menu:add_to_cart":
+                    return;
             }
         }
 
