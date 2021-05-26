@@ -8,7 +8,7 @@ namespace TestTaskTelegramBot.Service
     class Dish
     {
         private string _name, _description, _link, _cookingTime;
-        private int _itemId, _price;
+        private int _itemId, _price, _amount;
 
         public string Name { get => _name; set => _name = value; }
         public string Description { get => _description; set => _description = value; }
@@ -16,8 +16,9 @@ namespace TestTaskTelegramBot.Service
         public string CookingTime { get => _cookingTime; set => _cookingTime = value; }
         public int ItemId{ get => _itemId; set => _itemId = value; }
         public int Price { get => _price; set => _price = value; }
+        public int Amount { get => _amount; set => _amount = value; }
 
-        public Dish(string name, string description, string link, string cookingTime, int itemId, int price)
+        public Dish(string name, string description, string link, string cookingTime, int itemId, int price, int amount = 1)
         {
             Name = name;
             Description = description;
@@ -25,6 +26,7 @@ namespace TestTaskTelegramBot.Service
             CookingTime = cookingTime;
             ItemId = itemId;
             Price = price;
+            Amount = amount;
         }
 
         public Dish(string id)
@@ -49,6 +51,7 @@ namespace TestTaskTelegramBot.Service
                                 CookingTime = Convert.ToString(reader["cooking_time"]);
                                 Price = Convert.ToInt32(reader["price"]);
                                 ItemId = Convert.ToInt32(reader["item_id"]);
+                                Amount = 1;
                             }
                         }
                 }

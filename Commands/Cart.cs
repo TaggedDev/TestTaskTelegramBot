@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Telegram.Bot.Types.ReplyMarkups;
 using TestTaskTelegramBot.Service;
@@ -14,28 +15,34 @@ namespace TestTaskTelegramBot.Commands
         /// <param name="chatId">User chatId</param>
         public async static void Overview(long chatId)
         {
-            //List<Dish> dishes = Menu.GetDishes(chatId);
             List<Dish> dishes = new List<Dish>();
-            string[] itemsid = DatabaseHandler.GetCart(Convert.ToString(chatId)).Split(';');
+            string[] itemsid = DatabaseHandler.GetCart(Convert.ToString(chatId)).Split(';'); // Splits the shopping cart into IDs
 
+            // Gets every Id and creates dish out of it
             foreach (string item in itemsid)
             {
                 if (item != "")
                 {
                     Dish dish = new Dish(item);
-                    dishes.Add(dish);
+                    if (dishes.Any(obj => Convert.ToString(obj.ItemId).Equals(item)))
+                        dishes.Find(obj => Convert.ToString(obj.ItemId).Equals(item)).Amount += 1; // if there is an object like that one, adds amount instead of creating new item
+                    else
+                        dishes.Add(dish);
                 }
                 
             }
 
             string textMessage = "Ваша корзина: \n";
             int price = 0;
+
+            // Generating the output message
             foreach (Dish dish in dishes)
             {
-                textMessage += $"\n{dish.Name} - {dish.Price}";
-                price += dish.Price;
+                textMessage += $"\n*{dish.Name}* - {dish.Price} [`{dish.Amount}`]";
+                price += dish.Price * dish.Amount;
             }
-            textMessage += $"\nИтого: {price}руб.";
+            textMessage += $"\n\nИтого: *{price}₽.*";
+
             var inlineKeyboard = new InlineKeyboardMarkup(new[]
                                {
                                 new[] { InlineKeyboardButton.WithCallbackData("В меню", "start:menu") },
@@ -44,7 +51,7 @@ namespace TestTaskTelegramBot.Commands
                                 new[] { InlineKeyboardButton.WithCallbackData("Оформить заказ", "cart:finish") }
                             });
 
-            await Bot.Get().SendTextMessageAsync(chatId: chatId, text: textMessage, replyMarkup: inlineKeyboard);
+            await Bot.Get().SendTextMessageAsync(chatId: chatId, text: textMessage, replyMarkup: inlineKeyboard, parseMode: Telegram.Bot.Types.Enums.ParseMode.Markdown);
         }
 
         public async static void Delete(long chatId)
@@ -84,6 +91,10 @@ namespace TestTaskTelegramBot.Commands
             await Bot.Get().SendTextMessageAsync(chatId, textMessage, replyMarkup: inlineKeyboard);
         }
 
+        /// <summary>
+        /// Finishes the order, sends message and empties the cart
+        /// </summary>
+        /// <param name="chatId">User's chat ID</param>
         public async static void Finish(long chatId)
         {
             DatabaseHandler.ExecuteSQL($"UPDATE users SET cart = \'\' WHERE chat_id={chatId}");
@@ -91,6 +102,10 @@ namespace TestTaskTelegramBot.Commands
             await Bot.Get().SendTextMessageAsync(chatId: chatId, text: messageText);
         }
 
+        /// <summary>
+        /// Empties the shopping cart
+        /// </summary>
+        /// <param name="chatId">User's chat ID</param>
         public async static void Empty(long chatId)
         {
             DatabaseHandler.ExecuteSQL($"UPDATE users SET cart = \'\' WHERE chat_id={chatId}");
