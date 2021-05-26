@@ -43,8 +43,9 @@ namespace TestTaskTelegramBot.Commands
                 await Bot.Get().SendPhotoAsync(
                     chatId: chatId,
                     photo: dishes[i].Link,
-                    caption:  $"<b>{dishes[i].Name}</b>\n{dishes[i].Description}\n\nПриблизительное время приготовления: <i>{dishes[i].CookingTime}<i>\nЦена: <i>{dishes[i].Price}<i>",
-                    replyMarkup: inlineKeyboard
+                    caption: $"<b>{dishes[i].Name}</b>\n{dishes[i].Description}\n\nПриблизительное время приготовления: <i>{dishes[i].CookingTime}</i>\nЦена: <i>{dishes[i].Price}</i>",
+                    replyMarkup: inlineKeyboard,
+                    parseMode: Telegram.Bot.Types.Enums.ParseMode.Html
                     );
             }
         }
