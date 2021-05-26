@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Data.Sqlite;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -24,6 +25,35 @@ namespace TestTaskTelegramBot.Service
             CookingTime = cookingTime;
             ItemId = itemId;
             Price = price;
+        }
+
+        public Dish(string id)
+        {
+            using (var connection = new SqliteConnection("Data Source=chef.db"))
+            {
+                connection.Open();
+                string sqlExpression = $"SELECT * FROM items";
+                SqliteCommand command = new SqliteCommand(sqlExpression, connection);
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows) // If there is data
+                        while (reader.Read())   // Reads data by lines
+                        {
+                            string getId = Convert.ToString(reader["item_id"]);
+
+                            if (getId.Equals(id))
+                            {
+                                Name = Convert.ToString(reader["name"]);
+                                Description = Convert.ToString(reader["description"]);
+                                Link = Convert.ToString(reader["picture"]);
+                                CookingTime = Convert.ToString(reader["cooking_time"]);
+                                Price = Convert.ToInt32(reader["price"]);
+                                ItemId = Convert.ToInt32(reader["item_id"]);
+                            }
+                        }
+                }
+            }
+
         }
     }
 }
