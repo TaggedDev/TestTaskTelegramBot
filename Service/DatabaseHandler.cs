@@ -12,7 +12,7 @@ namespace TestTaskTelegramBot.Service
         /// <param name="dishId">Id of the dish</param>
         public static void AddItem(long chatId, string dishId)
         {
-            string userCart = GetCart(chatId);
+            string userCart = GetCart(Convert.ToString(chatId));
             userCart = userCart + ";" + dishId;
             ExecuteSQL($"UPDATE users SET cart = \'{userCart}\'");
         }
@@ -21,7 +21,7 @@ namespace TestTaskTelegramBot.Service
         /// Returns the cart from the users in chef.DB
         /// </summary>
         /// <param name="chatId">User's chat id</param>
-        private static string GetCart(long chatId)
+        public static string GetCart(string chatId)
         {
             using (var connection = new SqliteConnection("Data Source=chef.db"))
             {
@@ -33,7 +33,7 @@ namespace TestTaskTelegramBot.Service
                     if (reader.HasRows) // если есть данные
                         while (reader.Read())   // построчно считываем данные
                         {
-                            string getId = Convert.ToString(reader[$"{chatId}"]);
+                            string getId = Convert.ToString(reader[$"chat_id"]);
 
                             if (getId.Equals(chatId))
                                 return Convert.ToString(reader["cart"]);
