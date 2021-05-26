@@ -54,7 +54,7 @@ namespace TestTaskTelegramBot.Commands
         /// </summary>
         /// <param name="name">Case-sensitive category name</param>
         /// <returns>Returns List of Dish and if finds nothing, returns empty list</returns>
-        private static List<Dish> GetDishes(string name)
+        public static List<Dish> GetDishes(string name)
         {
             List<Dish> dishes = new List<Dish>();
             using (var connection = new SqliteConnection("Data Source=chef.db"))
