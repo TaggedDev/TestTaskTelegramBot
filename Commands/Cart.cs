@@ -20,8 +20,12 @@ namespace TestTaskTelegramBot.Commands
 
             foreach (string item in itemsid)
             {
-                Dish dish = new Dish(item);
-                dishes.Add(dish);
+                if (item != "")
+                {
+                    Dish dish = new Dish(item);
+                    dishes.Add(dish);
+                }
+                
             }
 
             string textMessage = "Ваша корзина: \n";

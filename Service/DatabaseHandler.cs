@@ -13,7 +13,7 @@ namespace TestTaskTelegramBot.Service
         public static void AddItem(long chatId, string dishId)
         {
             string userCart = GetCart(Convert.ToString(chatId));
-            userCart = userCart + ";" + dishId;
+            userCart = userCart + dishId + ";";
             ExecuteSQL($"UPDATE users SET cart = \'{userCart}\'");
         }
 
