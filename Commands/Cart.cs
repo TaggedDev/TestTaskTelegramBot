@@ -15,10 +15,54 @@ namespace TestTaskTelegramBot.Commands
         /// <param name="chatId">User chatId</param>
         public async static void Overview(long chatId)
         {
-            List<Dish> dishes = new List<Dish>();
+
+            string textMessage = "*Ваша корзина:*\n";
+            textMessage += GetCartMessage(chatId);
+
+            var inlineKeyboard = new InlineKeyboardMarkup(new[]
+                               {
+                                new[] { InlineKeyboardButton.WithCallbackData("В меню", "start:menu") },
+                                new[] { InlineKeyboardButton.WithCallbackData("Очистить корзину", "cart:empty") },
+                                new[] { InlineKeyboardButton.WithCallbackData("Редактировать заказ", "cart:delete") },
+                                new[] { InlineKeyboardButton.WithCallbackData("Оформить заказ", "cart:finish") }
+                            });
+
+            await Bot.Get().SendTextMessageAsync(chatId: chatId, text: textMessage, replyMarkup: inlineKeyboard, parseMode: Telegram.Bot.Types.Enums.ParseMode.Markdown);
+        }
+
+        /// <summary>
+        /// Used to generate and return shopping cart message
+        /// </summary>
+        /// <param name="chatId">Users' chat ID</param>
+        /// <returns>Returns finished message with cart</returns>
+        private static string GetCartMessage(long chatId)
+        {
             string[] itemsid = DatabaseHandler.GetCart(Convert.ToString(chatId)).Split(';'); // Splits the shopping cart into IDs
 
             // Gets every Id and creates dish out of it
+            List<Dish> dishes = GetDishesList(itemsid);
+
+            string textMessage = "";
+            int price = 0;
+
+            // Generating the output message
+            foreach (Dish dish in dishes)
+            {
+                textMessage += $"\n*{dish.Name}* - {dish.Price} [`{dish.Amount}`]";
+                price += dish.Price * dish.Amount;
+            }
+            textMessage += $"\n\nИтого: *{price}₽.*";
+            return textMessage;
+        }
+
+        /// <summary>
+        /// Uses shopping cart to return List of Dish
+        /// </summary>
+        /// <param name="itemsid">shopping cart from SQL table</param>
+        /// <returns>returns the list of Dish objects</returns>
+        private static List<Dish> GetDishesList(string[] itemsid)
+        {
+            List<Dish> dishes = new List<Dish>();
             foreach (string item in itemsid)
             {
                 if (item != "")
@@ -29,66 +73,125 @@ namespace TestTaskTelegramBot.Commands
                     else
                         dishes.Add(dish);
                 }
-                
             }
 
-            string textMessage = "Ваша корзина: \n";
-            int price = 0;
-
-            // Generating the output message
-            foreach (Dish dish in dishes)
-            {
-                textMessage += $"\n*{dish.Name}* - {dish.Price} [`{dish.Amount}`]";
-                price += dish.Price * dish.Amount;
-            }
-            textMessage += $"\n\nИтого: *{price}₽.*";
-
-            var inlineKeyboard = new InlineKeyboardMarkup(new[]
-                               {
-                                new[] { InlineKeyboardButton.WithCallbackData("В меню", "start:menu") },
-                                new[] { InlineKeyboardButton.WithCallbackData("Очистить корзину", "cart:empty") },
-                                new[] { InlineKeyboardButton.WithCallbackData("Удалить блюдо", "cart:delete") },
-                                new[] { InlineKeyboardButton.WithCallbackData("Оформить заказ", "cart:finish") }
-                            });
-
-            await Bot.Get().SendTextMessageAsync(chatId: chatId, text: textMessage, replyMarkup: inlineKeyboard, parseMode: Telegram.Bot.Types.Enums.ParseMode.Markdown);
+            return dishes;
         }
 
+        /// <summary>
+        /// Deletes item from the cart
+        /// </summary>
+        /// <param name="chatId"></param>
         public async static void Delete(long chatId)
         {
             string textMessage = "Выберите элемент для удаления\n";
-            
-            List<Dish> dishes = new List<Dish>();
-            string[] itemsid = DatabaseHandler.GetCart(Convert.ToString(chatId)).Split(';');
 
-            foreach (string item in itemsid)
+            // Получаем список всех товаров как в корзину (с амоунтом)
+            string[] itemsid = DatabaseHandler.GetCart(Convert.ToString(chatId)).Split(';'); // Splits the shopping cart into IDs
+            List<Dish> dishes = GetDishesList(itemsid);
+
+            for (int i = 0; i < dishes.Count; i++)
             {
-                Dish dish = new Dish(item);
-                dishes.Add(dish);
+                Dish dish = dishes[i];
+                textMessage += $"\n*{dish.Name}* - {dish.Price} [`{dish.Amount}`]";
             }
 
-            for (int i = 0; i < dishes.Count/8; i++)
+            // Создаем кнопки для каждого товара
+            /*for (int i = 0; i < dishes.Count; i++)
             {
-                textMessage += $"{i+1}. {dishes[i].Name}\n";
+                // https://stackoverflow.com/questions/39884961/create-dynamic-keyboard-telegram-bot-in-c-sharp-mrroundrobin-api
+            }*/
+
+            textMessage += $"\n\nНажмите кнопку *закончить*, чтобы закончить редактировать заказ";
+
+            InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(GetInlineKeyboard(dishes));
+
+            await Bot.Get().SendTextMessageAsync(chatId, textMessage, replyMarkup: inlineKeyboard, parseMode: Telegram.Bot.Types.Enums.ParseMode.Markdown);
+        }
+
+        /// <summary>
+        /// Generates keyboard to send
+        /// </summary>
+        /// <param name="dishes">List of Dishes </param>
+        /// <returns></returns>
+        private static InlineKeyboardButton[][] GetInlineKeyboard(List<Dish> dishes)
+        {
+            int amount;
+            if (dishes.Count < 5)
+                amount = 1;
+            else
+                amount = (dishes.Count / 4) + 1;
+
+            var keyboardInline = new InlineKeyboardButton[amount+1][]; // lines
+            var keyboardButtons = new InlineKeyboardButton[4]; // rows
+
+            int counter = 0;
+
+            for (int j = 0; j < amount; j++)
+            {
+                for (int i = 0; i < 4 /*&& counter < dishes.Count*/; i++)
+                {
+                    
+                    if (counter < dishes.Count)
+                    {
+                        keyboardButtons[i] = new InlineKeyboardButton
+                        {
+                            Text = Convert.ToString(counter + 1),
+                            CallbackData = $"cart:delete_item{dishes[counter].ItemId}",
+                        };
+                        counter++;
+                    } 
+                    else
+                    {
+                        keyboardButtons[i] = new InlineKeyboardButton
+                        {
+                            Text = "#",
+                            CallbackData = "none",
+                        };
+                    }
+                    
+                }
+                keyboardInline[j] = keyboardButtons;
+                keyboardButtons = new InlineKeyboardButton[4];
             }
-            textMessage += $"\nНажмите кнопку *закончить*, чтобы закончить редактировать заказ";
 
-            var inlineKeyboard = new InlineKeyboardMarkup(new[]
-                               {
-                                new[] { InlineKeyboardButton.WithCallbackData("1", "cart"),
-                                        InlineKeyboardButton.WithCallbackData("2", "start:menu")},
-                                new[] { InlineKeyboardButton.WithCallbackData("3", "cart:empty"),
-                                        InlineKeyboardButton.WithCallbackData("4", "cart:empty")},
-                                new[] { InlineKeyboardButton.WithCallbackData("5", "cart:delete"),
-                                        InlineKeyboardButton.WithCallbackData("6", "cart:delete")},
-                                new[] { InlineKeyboardButton.WithCallbackData("7", "cart:finish"),
-                                        InlineKeyboardButton.WithCallbackData("8", "cart:finish")},
-                                new[] { InlineKeyboardButton.WithCallbackData("Назад", "cart:finish"),
-                                        InlineKeyboardButton.WithCallbackData("Вперёд", "cart:finish")},
-                                new[] { InlineKeyboardButton.WithCallbackData("Закончить", "cart:finish") }
-                            });
+            // Add the last line to the keyboard
+            keyboardButtons[0] = new InlineKeyboardButton
+            {
+                Text = "Корзина",
+                CallbackData = "menu:cart",
+            };
+            keyboardButtons[1] = new InlineKeyboardButton
+            {
+                Text = "В меню",
+                CallbackData = "start:menu",
+            };
+            keyboardButtons[2] = new InlineKeyboardButton
+            {
+                Text = "Оформить заказ",
+                CallbackData = "cart:finish",
+            };
+            keyboardButtons[3] = new InlineKeyboardButton
+            {
+                Text = "Опустошить корзину",
+                CallbackData = "cart:empty",
+            };
+            keyboardInline[amount] = keyboardButtons;
 
-            await Bot.Get().SendTextMessageAsync(chatId, textMessage, replyMarkup: inlineKeyboard);
+            return keyboardInline;
+        }
+
+        /// <summary>
+        /// Function removes item from the shopping cart
+        /// </summary>
+        /// <param name="chatId">User chat Id</param>
+        /// <param name="removeId">Remove item Id</param>
+        public static void DeleteItem(long chatId, string removeId)
+        {
+            string[] cart = DatabaseHandler.GetCart(Convert.ToString(chatId)).Split(';');
+            cart = cart.Where(obj => obj != removeId).ToArray();
+            string newCart = string.Join(";", cart);
+            DatabaseHandler.ExecuteSQL($"UPDATE users SET cart = '{newCart}' WHERE chat_id={chatId}");
         }
 
         /// <summary>

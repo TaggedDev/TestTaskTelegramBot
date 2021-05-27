@@ -48,9 +48,9 @@ namespace TestTaskTelegramBot
             long chatId = e.CallbackQuery.Message.Chat.Id;
 
             string check = e.CallbackQuery.Data;
-            string dishId = "0";
+            string dishId = "0", removeId = "0";
 
-            if (check.Length > 15)
+            if (check.Substring(0, 4).Equals("menu") && check.Length > 15)
             {
                 string cut = e.CallbackQuery.Data.Substring(0, 16);
                 if (cut.Equals("menu:add_to_cart"))
@@ -59,14 +59,22 @@ namespace TestTaskTelegramBot
                     check = "menu:add_to_cart";
                 }
             }
+
+            if (check.Substring(0, 4).Equals("cart") && check.Length > 15)
+            {
+                string cut = e.CallbackQuery.Data.Substring(0, 16);
+                if (cut.Equals("cart:delete_item"))
+                {
+                    removeId = check.Substring(16);
+                    check = "cart:delete_item";
+                }
+            }
             
 
             switch (check)
             {
                 case "start:menu":
                     Menu.StartMenu(chatId);
-                    return;
-                case "start:cart":
                     return;
                 case "menu:main_course":
                     Menu.SendDishesCategory(chatId, "main_course");
@@ -88,6 +96,9 @@ namespace TestTaskTelegramBot
                     return;
                 case "cart:finish":
                     Cart.Finish(chatId);
+                    return;
+                case "cart:delete_item":
+                    Cart.DeleteItem(chatId, removeId);
                     return;
             }
         }
