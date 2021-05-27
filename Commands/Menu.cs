@@ -19,8 +19,8 @@ namespace TestTaskTelegramBot.Commands
             string textMessage = "Используйте кнопки для навигации по меню.";
             var inlineKeyboard = new InlineKeyboardMarkup(new[]
                            {
-                                new[] { InlineKeyboardButton.WithCallbackData("Основные блюда", "menu:main_course") },
-                                new[] { InlineKeyboardButton.WithCallbackData("Десерты", "menu:dessert") }
+                                new[] { InlineKeyboardButton.WithCallbackData("🍖 Основные блюда", "menu:main_course") },
+                                new[] { InlineKeyboardButton.WithCallbackData("🍨 Десерты", "menu:dessert") }
                             });
             await Bot.Get().SendTextMessageAsync(chatId: chatId, text: textMessage, replyMarkup: inlineKeyboard);
         }
@@ -36,9 +36,9 @@ namespace TestTaskTelegramBot.Commands
             {
                 var inlineKeyboard = new InlineKeyboardMarkup(new[]
                                {
-                                new[] { InlineKeyboardButton.WithCallbackData("Добавить в корзину", $"menu:add_to_cart{dishes[i].ItemId}") },
-                                new[] { InlineKeyboardButton.WithCallbackData("Назад", $"start:menu") },
-                                new[] { InlineKeyboardButton.WithCallbackData("Посмотреть корзину", $"cart:overview") }
+                                new[] { InlineKeyboardButton.WithCallbackData("🔽 Добавить в корзину", $"menu:add_to_cart{dishes[i].ItemId}") },
+                                new[] { InlineKeyboardButton.WithCallbackData("◀️ Меню", $"start:menu") },
+                                new[] { InlineKeyboardButton.WithCallbackData("🛒 Посмотреть корзину", $"cart:overview") }
                             });
 
                 await Bot.Get().SendPhotoAsync(
@@ -109,9 +109,9 @@ namespace TestTaskTelegramBot.Commands
 
             var inlineKeyboard = new InlineKeyboardMarkup(new[]
                                {
-                                new[] { InlineKeyboardButton.WithCallbackData($"Добавить в корзину ({amount})", $"menu:add_to_cart{dishId}") },
-                                new[] { InlineKeyboardButton.WithCallbackData("В меню", $"start:menu") },
-                                new[] { InlineKeyboardButton.WithCallbackData("Посмотреть корзину", $"cart:overview") }
+                                new[] { InlineKeyboardButton.WithCallbackData($"🔽 Добавить в корзину ({amount})", $"menu:add_to_cart{dishId}") },
+                                new[] { InlineKeyboardButton.WithCallbackData("◀️ Меню", $"start:menu") },
+                                new[] { InlineKeyboardButton.WithCallbackData("🛒 Посмотреть корзину", $"cart:overview") }
                             });
 
             Bot.Get().EditMessageReplyMarkupAsync(chatId, messageId, inlineKeyboard);

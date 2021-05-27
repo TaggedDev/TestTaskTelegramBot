@@ -21,10 +21,10 @@ namespace TestTaskTelegramBot.Commands
 
             var inlineKeyboard = new InlineKeyboardMarkup(new[]
                                {
-                                new[] { InlineKeyboardButton.WithCallbackData("В меню", "start:menu") },
-                                new[] { InlineKeyboardButton.WithCallbackData("Очистить корзину", "cart:empty") },
-                                new[] { InlineKeyboardButton.WithCallbackData("Редактировать заказ", "cart:delete") },
-                                new[] { InlineKeyboardButton.WithCallbackData("Оформить заказ", "cart:finish") }
+                                new[] { InlineKeyboardButton.WithCallbackData("📖 В меню", "start:menu") },
+                                new[] { InlineKeyboardButton.WithCallbackData("📭 Очистить корзину", "cart:empty") },
+                                new[] { InlineKeyboardButton.WithCallbackData("✏️ Редактировать заказ", "cart:delete") },
+                                new[] { InlineKeyboardButton.WithCallbackData("✅ Оформить заказ", "cart:finish") }
                             });
 
             await Bot.Get().SendTextMessageAsync(chatId: chatId, text: textMessage, replyMarkup: inlineKeyboard, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html);
@@ -158,22 +158,22 @@ namespace TestTaskTelegramBot.Commands
             // Add the last line to the keyboard
             keyboardButtons[0] = new InlineKeyboardButton
             {
-                Text = "Корзина",
+                Text = "🛒 Корзина",
                 CallbackData = "cart:overview",
             };
             keyboardButtons[1] = new InlineKeyboardButton
             {
-                Text = "В меню",
+                Text = "📖 В меню",
                 CallbackData = "start:menu",
             };
             keyboardButtons[2] = new InlineKeyboardButton
             {
-                Text = "Оформить заказ",
+                Text = "✅ Оформить заказ",
                 CallbackData = "cart:finish",
             };
             keyboardButtons[3] = new InlineKeyboardButton
             {
-                Text = "Опустошить корзину",
+                Text = "📭 Опустошить корзину",
                 CallbackData = "cart:empty",
             };
             keyboardInline[amount] = keyboardButtons;
