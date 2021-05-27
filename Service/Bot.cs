@@ -27,7 +27,7 @@ namespace TestTaskTelegramBot
                     Token = sr.ReadLine();
                     Console.WriteLine(Token);
                 }
-                botClient = new TelegramBotClient(Token) { Timeout = TimeSpan.FromSeconds(3) };
+                botClient = new TelegramBotClient(Token) { Timeout = TimeSpan.FromMilliseconds(750) };
             }
             return botClient;
         }

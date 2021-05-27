@@ -16,7 +16,7 @@ namespace TestTaskTelegramBot.Commands
         public async static void Overview(long chatId)
         {
 
-            string textMessage = "*Ваша корзина:*\n";
+            string textMessage = "<b>Ваша корзина:</b>\n";
             textMessage += GetCartMessage(chatId);
 
             var inlineKeyboard = new InlineKeyboardMarkup(new[]
@@ -27,7 +27,7 @@ namespace TestTaskTelegramBot.Commands
                                 new[] { InlineKeyboardButton.WithCallbackData("Оформить заказ", "cart:finish") }
                             });
 
-            await Bot.Get().SendTextMessageAsync(chatId: chatId, text: textMessage, replyMarkup: inlineKeyboard, parseMode: Telegram.Bot.Types.Enums.ParseMode.Markdown);
+            await Bot.Get().SendTextMessageAsync(chatId: chatId, text: textMessage, replyMarkup: inlineKeyboard, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html);
         }
 
         /// <summary>
@@ -48,10 +48,10 @@ namespace TestTaskTelegramBot.Commands
             // Generating the output message
             foreach (Dish dish in dishes)
             {
-                textMessage += $"\n*{dish.Name}* - {dish.Price} [`{dish.Amount}`]";
+                textMessage += $"\n<b>{dish.Name}</b> - {dish.Price} [{dish.Amount}]";
                 price += dish.Price * dish.Amount;
             }
-            textMessage += $"\n\nИтого: *{price}₽.*";
+            textMessage += $"\n\nИтого: <b>{price}₽.</b>";
             return textMessage;
         }
 
@@ -60,7 +60,7 @@ namespace TestTaskTelegramBot.Commands
         /// </summary>
         /// <param name="itemsid">shopping cart from SQL table</param>
         /// <returns>returns the list of Dish objects</returns>
-        private static List<Dish> GetDishesList(string[] itemsid)
+        public static List<Dish> GetDishesList(string[] itemsid)
         {
             List<Dish> dishes = new List<Dish>();
             foreach (string item in itemsid)
@@ -93,7 +93,7 @@ namespace TestTaskTelegramBot.Commands
             for (int i = 0; i < dishes.Count; i++)
             {
                 Dish dish = dishes[i];
-                textMessage += $"\n*{dish.Name}* - {dish.Price} [`{dish.Amount}`]";
+                textMessage += $"\n<b>{dish.Name}</b> - {dish.Price} [{dish.Amount}]";
             }
 
             // Создаем кнопки для каждого товара
@@ -102,11 +102,11 @@ namespace TestTaskTelegramBot.Commands
                 // https://stackoverflow.com/questions/39884961/create-dynamic-keyboard-telegram-bot-in-c-sharp-mrroundrobin-api
             }*/
 
-            textMessage += $"\n\nНажмите кнопку *закончить*, чтобы закончить редактировать заказ";
+            textMessage += $"\n\nНажмите кнопку <b>закончить</b>, чтобы закончить редактировать заказ";
 
             InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(GetInlineKeyboard(dishes));
 
-            await Bot.Get().SendTextMessageAsync(chatId, textMessage, replyMarkup: inlineKeyboard, parseMode: Telegram.Bot.Types.Enums.ParseMode.Markdown);
+            await Bot.Get().SendTextMessageAsync(chatId, textMessage, replyMarkup: inlineKeyboard, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html);
         }
 
         /// <summary>
@@ -159,7 +159,7 @@ namespace TestTaskTelegramBot.Commands
             keyboardButtons[0] = new InlineKeyboardButton
             {
                 Text = "Корзина",
-                CallbackData = "menu:cart",
+                CallbackData = "cart:overview",
             };
             keyboardButtons[1] = new InlineKeyboardButton
             {

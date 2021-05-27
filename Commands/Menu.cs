@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -92,9 +93,28 @@ namespace TestTaskTelegramBot.Commands
         /// </summary>
         /// <param name="chatId">User's chat id</param>
         /// <param name="dishId">Id of the dish</param>
-        public static void AddToCart(long chatId, string dishId)
+        public static void AddToCart(long chatId, string dishId, int messageId)
         {
             DatabaseHandler.AddItem(chatId, dishId);
+
+            string[] itemsid = DatabaseHandler.GetCart(Convert.ToString(chatId)).Split(';'); // Splits the shopping cart into IDs
+            List<Dish> dishes = Cart.GetDishesList(itemsid);
+
+            int amount = 0;
+            foreach (Dish item in dishes)
+            {
+                if (Convert.ToString(item.ItemId).Equals(dishId))
+                    amount++;                
+            }
+
+            var inlineKeyboard = new InlineKeyboardMarkup(new[]
+                               {
+                                new[] { InlineKeyboardButton.WithCallbackData($"Добавить в корзину ({amount})", $"menu:add_to_cart{dishId}") },
+                                new[] { InlineKeyboardButton.WithCallbackData("В меню", $"start:menu") },
+                                new[] { InlineKeyboardButton.WithCallbackData("Посмотреть корзину", $"cart:overview") }
+                            });
+
+            Bot.Get().EditMessageReplyMarkupAsync(chatId, messageId, inlineKeyboard);
         }
     }
 }

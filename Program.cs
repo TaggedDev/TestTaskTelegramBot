@@ -83,7 +83,7 @@ namespace TestTaskTelegramBot
                     Menu.SendDishesCategory(chatId, "dessert");
                     return;
                 case "menu:add_to_cart":
-                    Menu.AddToCart(chatId, dishId);
+                    Menu.AddToCart(chatId, dishId, e.CallbackQuery.Message.MessageId);
                     return;
                 case "cart:overview":
                     Cart.Overview(chatId);
