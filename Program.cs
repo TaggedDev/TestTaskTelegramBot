@@ -33,6 +33,7 @@ namespace TestTaskTelegramBot
         {
             DatabaseHandler.ExecuteSQL("CREATE TABLE IF NOT EXISTS items (item_id INTEGER UNIQUE, name VARCHAR(25), description VARCHAR(255), price INTEGER, picture VARCHAR(255), cooking_time VARCHAR(255), category VARCHAR(30))");
             DatabaseHandler.ExecuteSQL("CREATE TABLE IF NOT EXISTS users (chat_id INTEGER UNIQUE, cart VARCHAR(255))");
+            DatabaseHandler.ExecuteSQL("CREATE TABLE IF NOT EXISTS orders (order_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, order_time TIMESTAMP, cart VARCHAR(255))");
             /*DatabaseHandler.ExecuteSQL("INSERT INTO items VALUES (1, \'плов\', \'сначала укропу, потом кошачьу жопу\', 5000, \'https://www.gastronom.ru/binfiles/images/20170418/b87bb973.jpg', \'10 мин\', \'main_course\')");
             DatabaseHandler.ExecuteSQL("INSERT INTO items VALUES (2, \'курица\', \'нет блин корова\', 300, \'https://lapku.ru/images/44508/kuritsa-nesushka.jpg', \'15 мин\', \'main_course\')");
             DatabaseHandler.ExecuteSQL("INSERT INTO items VALUES (3, \'чекактобыло\', \'я не запомнил название\', 1000, \'https://www.patee.ru/r/x6/14/b8/6d/960m.jpg', \'5 мин\', \'main_course\')");
