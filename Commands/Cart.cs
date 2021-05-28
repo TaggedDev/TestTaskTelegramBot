@@ -84,7 +84,7 @@ namespace TestTaskTelegramBot.Commands
         /// <param name="chatId"></param>
         public async static void Delete(long chatId)
         {
-            string textMessage = "Выберите элемент для удаления\n";
+            string textMessage = "Чтобы удалить элемент, нажмите на кнопку с номером блюда под сообщением\n";
 
             // Получаем список всех товаров как в корзину (с амоунтом)
             string[] itemsid = DatabaseHandler.GetCart(Convert.ToString(chatId)).Split(';'); // Splits the shopping cart into IDs
@@ -93,16 +93,11 @@ namespace TestTaskTelegramBot.Commands
             for (int i = 0; i < dishes.Count; i++)
             {
                 Dish dish = dishes[i];
-                textMessage += $"\n<b>{dish.Name}</b> - {dish.Price} [{dish.Amount}]";
+                textMessage += $"\n<b>{i+1}. {dish.Name}</b> - {dish.Price} [{dish.Amount}]";
             }
+            
 
-            // Создаем кнопки для каждого товара
-            /*for (int i = 0; i < dishes.Count; i++)
-            {
-                // https://stackoverflow.com/questions/39884961/create-dynamic-keyboard-telegram-bot-in-c-sharp-mrroundrobin-api
-            }*/
-
-            textMessage += $"\n\nНажмите кнопку <b>закончить</b>, чтобы закончить редактировать заказ";
+            textMessage += $"\n\nЧтобы увидеть конечную корзину, нажмите на кнопку \"Корзина\"";
 
             InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(GetInlineKeyboard(dishes));
 
@@ -116,6 +111,7 @@ namespace TestTaskTelegramBot.Commands
         /// <returns></returns>
         private static InlineKeyboardButton[][] GetInlineKeyboard(List<Dish> dishes)
         {
+            // https://stackoverflow.com/questions/39884961/create-dynamic-keyboard-telegram-bot-in-c-sharp-mrroundrobin-api
             int amount;
             if (dishes.Count < 5)
                 amount = 1;
@@ -136,7 +132,7 @@ namespace TestTaskTelegramBot.Commands
                     {
                         keyboardButtons[i] = new InlineKeyboardButton
                         {
-                            Text = Convert.ToString(counter + 1),
+                            Text = $"{Convert.ToString(counter + 1)}",
                             CallbackData = $"cart:delete_item{dishes[counter].ItemId}",
                         };
                         counter++;
@@ -145,7 +141,7 @@ namespace TestTaskTelegramBot.Commands
                     {
                         keyboardButtons[i] = new InlineKeyboardButton
                         {
-                            Text = "#",
+                            Text = " ",
                             CallbackData = "none",
                         };
                     }

@@ -37,7 +37,7 @@ namespace TestTaskTelegramBot.Commands
                 var inlineKeyboard = new InlineKeyboardMarkup(new[]
                                {
                                 new[] { InlineKeyboardButton.WithCallbackData("🔽 Добавить в корзину", $"menu:add_to_cart{dishes[i].ItemId}") },
-                                new[] { InlineKeyboardButton.WithCallbackData("◀️ Меню", $"start:menu") },
+                                new[] { InlineKeyboardButton.WithCallbackData("📖 Меню", $"start:menu") },
                                 new[] { InlineKeyboardButton.WithCallbackData("🛒 Посмотреть корзину", $"cart:overview") }
                             });
 
@@ -110,7 +110,7 @@ namespace TestTaskTelegramBot.Commands
             var inlineKeyboard = new InlineKeyboardMarkup(new[]
                                {
                                 new[] { InlineKeyboardButton.WithCallbackData($"🔽 Добавить в корзину ({amount})", $"menu:add_to_cart{dishId}") },
-                                new[] { InlineKeyboardButton.WithCallbackData("◀️ Меню", $"start:menu") },
+                                new[] { InlineKeyboardButton.WithCallbackData("📖 Меню", $"start:menu") },
                                 new[] { InlineKeyboardButton.WithCallbackData("🛒 Посмотреть корзину", $"cart:overview") }
                             });
 
