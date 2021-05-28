@@ -93,7 +93,7 @@ namespace TestTaskTelegramBot.Commands
         /// </summary>
         /// <param name="chatId">User's chat id</param>
         /// <param name="dishId">Id of the dish</param>
-        public static void AddToCart(long chatId, string dishId, int messageId)
+        public async static void AddToCart(long chatId, string dishId, int messageId)
         {
             DatabaseHandler.AddItem(chatId, dishId);
 
@@ -104,7 +104,7 @@ namespace TestTaskTelegramBot.Commands
             foreach (Dish item in dishes)
             {
                 if (Convert.ToString(item.ItemId).Equals(dishId))
-                    amount++;                
+                    amount = item.Amount;                
             }
 
             var inlineKeyboard = new InlineKeyboardMarkup(new[]
@@ -114,7 +114,7 @@ namespace TestTaskTelegramBot.Commands
                                 new[] { InlineKeyboardButton.WithCallbackData("🛒 Посмотреть корзину", $"cart:overview") }
                             });
 
-            Bot.Get().EditMessageReplyMarkupAsync(chatId, messageId, inlineKeyboard);
+            await Bot.Get().EditMessageReplyMarkupAsync(chatId, messageId, inlineKeyboard);
         }
     }
 }

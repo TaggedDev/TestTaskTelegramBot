@@ -196,7 +196,7 @@ namespace TestTaskTelegramBot.Commands
         /// <param name="chatId">User's chat ID</param>
         public async static void Finish(long chatId)
         {
-            DatabaseHandler.ExecuteSQL($"INSERT INTO orders (order_time, cart) VALUES ('{DateTime.Now}', '{DatabaseHandler.GetCart(Convert.ToString(chatId))}')");
+            DatabaseHandler.ExecuteSQL($"INSERT INTO orders (order_time, chat_id, cart) VALUES ('{DateTime.Now}', {chatId}, '{DatabaseHandler.GetCart(Convert.ToString(chatId))}')");
             DatabaseHandler.ExecuteSQL($"UPDATE users SET cart = \'\' WHERE chat_id={chatId}");
             string messageText = "Заказ оформлен";
             await Bot.Get().SendTextMessageAsync(chatId: chatId, text: messageText);
